@@ -1,5 +1,6 @@
 package org.apache.adldap;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.naming.NamingEnumeration;
@@ -71,7 +72,10 @@ public class Main {
 		System.out.println("Use Reversible Encryption Password: "+api.getUseRevEncryptPasswd(uac));
 		System.out.println("Allow Delegation: "+api.getAllowDelegation(uac));
 		System.out.println("Account LockedOut: "+api.getLockedOut(uacc));
-
+		List<String> groupList = api.getMemberOf(results);
+		for (int i = 0; i < groupList.size(); i++) {
+			System.out.println("Group: "+groupList.get(i));
+		}
 
 
 

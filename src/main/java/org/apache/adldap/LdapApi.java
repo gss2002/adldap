@@ -908,6 +908,65 @@ public class LdapApi {
 		}
 		return null;
 	}
+	
+	
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName
+	 * @return List memberOf
+	 */
+	public List<String> getMemberOf(LdapClient ldapClient, String baseDn, String samAccountName) {
+		List<String> groupList = new ArrayList<String>();
+		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("memberOf");
+				if (attr != null){
+					NamingEnumeration<?> attrEnum = attr.getAll();
+					while (attrEnum.hasMore()) {
+							 String group = attrEnum.next().toString();
+							 groupList.add(group);
+					}
+					return groupList;
+				}
+			}
+			
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * @param searchResults
+	 * @return List memberOf
+	 */
+	public List<String> getMemberOf(Map<String, Attribute> searchResults) {
+		List<String> groupList = new ArrayList<String>();
+		Attribute attr = searchResults.get("memberOf");
+		if (attr != null){
+				NamingEnumeration<?> attrEnum = null;
+				try {
+					attrEnum = attr.getAll();
+					while (attrEnum.hasMore()) {
+							 String group = attrEnum.next().toString();
+							 groupList.add(group);
+					}
+					return groupList;
+				} catch (NamingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+
+		return null;
+	}
 
 	/**
 	 * @param ldapClient
