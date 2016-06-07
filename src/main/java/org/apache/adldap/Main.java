@@ -27,7 +27,7 @@ public class Main {
 
 		System.out.println("DN: "+api.getDN(results));
 
-		System.out.println("DN: "+api.getManager(results));
+		System.out.println("Manger: "+api.getManager(results));
 
 		
 		System.out.println("UPN: "+api.getUPN(results));
@@ -74,7 +74,7 @@ public class Main {
 		System.out.println("Account LockedOut: "+api.getLockedOut(uacc));
 		List<String> groupList = api.getMemberOf(results);
 		for (int i = 0; i < groupList.size(); i++) {
-			System.out.println("Group: "+groupList.get(i));
+			System.out.println("MemberOf: "+groupList.get(i));
 		}
 
 
