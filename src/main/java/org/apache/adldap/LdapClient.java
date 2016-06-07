@@ -6,7 +6,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import javax.naming.Context;
+import javax.naming.NamingException;
 import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.SearchControls;
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -25,6 +27,7 @@ public class LdapClient {
 	String bindDN;
 	String bindPW;
 	String baseDN;
+	SearchControls constraints;
 	
 	/**
 	* Create a LdapClient with baseDn, bindDN, bindPW, and ldapURL.
@@ -45,6 +48,17 @@ public class LdapClient {
 		return this.env;
 	}
 	
+	public void destroyLdapClient() {
+		if (ldapCtx != null){
+			try {
+				ldapCtx.close();
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void createLdapClient() {
 		// Create a trust manager that does not validate certificate chains
 
@@ -59,6 +73,16 @@ public class LdapClient {
         this.env.put(Context.SECURITY_AUTHENTICATION, "simple");
         this.env.put(Context.SECURITY_PRINCIPAL, this.bindDN);
         this.env.put(Context.SECURITY_CREDENTIALS, this.bindPW);
+		try {
+			ldapCtx = new InitialDirContext(this.env);
+	    	this.constraints = new SearchControls();
+	    	this.constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+		} catch (NamingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+	
+		}
+
 	}
 	
 	public static class DummyTrustmanager implements X509TrustManager {
