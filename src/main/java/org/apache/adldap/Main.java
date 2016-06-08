@@ -17,10 +17,12 @@ public class Main {
 		String bindPw = "";
 		String ldapURL = "ldaps://seniadc1.senia.org:3269";
 		String samAccountName = "";
+		String groupSamAccountName = "";
 		LdapClient ldpClient = new LdapClient(baseDn, bindDn, bindPw, ldapURL);
 
 		LdapApi api = new LdapApi();
-		Map<String,Attribute> results = api.getADGCAttrs(ldpClient, baseDn, samAccountName);
+		Map<String,Attribute> groupResults = api.getADGroupGCAttrs(ldpClient, baseDn, groupSamAccountName);
+		Map<String,Attribute> results = api.getADUserGCAttrs(ldpClient, baseDn, samAccountName);
 		System.out.println("DisplayName: "+api.getDisplayName(ldpClient, baseDn, samAccountName));
 
 		System.out.println("CN: "+api.getCN(results));
@@ -76,6 +78,33 @@ public class Main {
 		for (int i = 0; i < groupList.size(); i++) {
 			System.out.println("MemberOf: "+groupList.get(i));
 		}
+		System.out.println("");
+		System.out.println("");
+		System.out.println("");
+
+		System.out.println("Get Group Info and Members: "+groupSamAccountName);
+		System.out.println("Group CN: "+api.getCN(groupResults));
+
+		System.out.println("Group DN: "+api.getDN(groupResults));
+		
+		System.out.println("Group Email: "+api.getUserMail(groupResults));
+
+		System.out.println("Group whenChanged: "+api.getWhenChanged(groupResults));
+
+		System.out.println("Group whenCreated: "+api.getWhenCreated(groupResults));
+		
+		System.out.println("Group uSNCreated: "+api.getUSNCreated(groupResults));
+
+		System.out.println("Group uSNChanged: "+api.getUSNChanged(groupResults));
+
+		System.out.println("Group createTimeStamp: "+api.getCreateTimeStamp(groupResults));
+
+		
+		System.out.println("Group modifyTimeStamp: "+api.getModifyTimeStamp(results));
+		List<String> groupMbrList = api.getGroupMembers(groupResults);
+		for (int i = 0; i < groupMbrList.size(); i++) {
+			System.out.println("Group Member: "+groupMbrList.get(i));
+		}	
 
 
 

@@ -41,13 +41,18 @@ public class LdapApi {
 	int UF_DONT_REQUIRE_PREAUTH = 0x400000;
 	int UF_PASSWORD_EXPIRED = 0x800000;
 
-	String[] globalCatalogAttrs = { "canonicalName", "cn", "c", "createTimeStamp", "description", "displayName",
+	String[] globalUserCatalogAttrs = { "canonicalName", "cn", "c", "createTimeStamp", "description", "displayName",
 			"distinguishedName", "givenName", "l", "lastLogonTimestamp", "mail", "manager", "memberOf",
 			"modifyTimeStamp", "msDS-KeyVersionNumber", "msDS-parentdistname", "msDS-PrincipalName",
 			"msDS-User-Account-Control-Computed", "msDS-UserPasswordExpiryTimeComputed", "name", "objectCategory",
 			"objectGUID", "objectSid", "primaryGroupID", "sAMAccountName", "sDRightsEffective", "sn", "st",
 			"telephoneNumber", "userAccountControl", "userPrincipalName", "uSNChanged", "uSNCreated", "whenChanged",
 			"whenCreated" };
+	String[] globalGroupCatalogAttrs = { "canonicalName", "cn", "createTimeStamp", "description", "displayName",
+			"distinguishedName", "groupType", "mail", "member",
+			"modifyTimeStamp", "msDS-parentdistname", "msDS-PrincipalName", "name", "objectCategory",
+			"objectGUID", "objectSid", "sAMAccountName", "sDRightsEffective",
+			"uSNChanged", "uSNCreated", "whenChanged", "whenCreated" };
 
 	/**
 	 * @param ldapDate
@@ -942,6 +947,63 @@ public class LdapApi {
 		}
 		return null;
 	}
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName
+	 * @return List member
+	 */
+	public List<String> getGroupMembers(LdapClient ldapClient, String baseDn, String samAccountName) {
+		List<String> groupList = new ArrayList<String>();
+		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=group))";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("member");
+				if (attr != null){
+					NamingEnumeration<?> attrEnum = attr.getAll();
+					while (attrEnum.hasMore()) {
+							 String group = attrEnum.next().toString();
+							 groupList.add(group);
+					}
+					return groupList;
+				}
+			}
+			
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * @param searchResults
+	 * @return List member
+	 */
+	public List<String> getGroupMembers(Map<String, Attribute> searchResults) {
+		List<String> groupList = new ArrayList<String>();
+		Attribute attr = searchResults.get("member");
+		if (attr != null){
+				NamingEnumeration<?> attrEnum = null;
+				try {
+					attrEnum = attr.getAll();
+					while (attrEnum.hasMore()) {
+							 String group = attrEnum.next().toString();
+							 groupList.add(group);
+					}
+					return groupList;
+				} catch (NamingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+
+		return null;
+	}
 	
 	/**
 	 * @param searchResults
@@ -1017,12 +1079,48 @@ public class LdapApi {
 		}
 		return uacc;
 	}
-
-	public Map<String, Attribute> getADGCAttrs(LdapClient ldapClient, String baseDn, String samAccountName) {
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName
+	 * @return Map<String, Attribute> userAttributeMap
+	 */
+	public Map<String, Attribute> getADUserGCAttrs(LdapClient ldapClient, String baseDn, String samAccountName) {
 		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
 		HashMap<String, Attribute> map = null;
 		SearchControls srchCntrls = ldapClient.constraints;
-		srchCntrls.setReturningAttributes(globalCatalogAttrs);
+		srchCntrls.setReturningAttributes(globalUserCatalogAttrs);
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.ldapCtx.search(baseDn, filter, srchCntrls);
+			map = new HashMap<String, Attribute>();
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				NamingEnumeration<? extends Attribute> attrEnum = searchResult.getAttributes().getAll();
+				while (attrEnum.hasMore()) {
+					Attribute att = attrEnum.next();
+					map.put(att.getID(), att);
+				}
+				return map;
+			}
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return map;
+	}
+	
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName
+	 * @return Map<String, Attribute> groupAttributeMap
+	 */
+	public Map<String, Attribute> getADGroupGCAttrs(LdapClient ldapClient, String baseDn, String samAccountName) {
+		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=group))";
+		HashMap<String, Attribute> map = null;
+		SearchControls srchCntrls = ldapClient.constraints;
+		srchCntrls.setReturningAttributes(globalGroupCatalogAttrs);
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.ldapCtx.search(baseDn, filter, srchCntrls);
