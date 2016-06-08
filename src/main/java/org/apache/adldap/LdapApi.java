@@ -53,6 +53,8 @@ public class LdapApi {
 			"modifyTimeStamp", "msDS-parentdistname", "msDS-PrincipalName", "name", "objectCategory",
 			"objectGUID", "objectSid", "sAMAccountName", "sDRightsEffective",
 			"uSNChanged", "uSNCreated", "whenChanged", "whenCreated" };
+	
+	String[] reverseAttrs = { "sAMAccountName", "cn"};
 
 	/**
 	 * @param ldapDate
@@ -914,6 +916,24 @@ public class LdapApi {
 		return null;
 	}
 	
+	/**
+	 * @param searchResults
+	 * @return String sAMAccountName
+	 */
+	public String getSamAccountName(Map<String, Attribute> searchResults) {
+		Attribute attr = searchResults.get("sAMAccountName");
+		if (attr != null) {
+			try {
+				String sAMAccountName = (String) attr.get();
+				return sAMAccountName;
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
 	
 	/**
 	 * @param ldapClient
@@ -1140,6 +1160,69 @@ public class LdapApi {
 		}
 		return map;
 	}
+	
+
+/**
+ * @param ldapClient
+ * @param baseDn
+ * @param dn
+ * @return Map<String, Attribute> userAttributeMap
+ */
+public Map<String, Attribute> getUserDNAttrs(LdapClient ldapClient, String baseDn, String dn) {
+	String filter = "(&(distinguishedName=" + dn + ")(objectclass=person))";
+	HashMap<String, Attribute> map = null;
+	SearchControls srchCntrls = ldapClient.constraints;
+	srchCntrls.setReturningAttributes(reverseAttrs);
+	NamingEnumeration<SearchResult> results;
+	try {
+		results = ldapClient.ldapCtx.search(baseDn, filter, srchCntrls);
+		map = new HashMap<String, Attribute>();
+		while (results.hasMore()) {
+			SearchResult searchResult = results.next();
+			NamingEnumeration<? extends Attribute> attrEnum = searchResult.getAttributes().getAll();
+			while (attrEnum.hasMore()) {
+				Attribute att = attrEnum.next();
+				map.put(att.getID(), att);
+			}
+			return map;
+		}
+	} catch (NamingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	return map;
+}
+
+/**
+ * @param ldapClient
+ * @param baseDn
+ * @param dn
+ * @return Map<String, Attribute> groupAttributeMap
+ */
+public Map<String, Attribute> getGroupDNAttrs(LdapClient ldapClient, String baseDn, String dn) {
+	String filter = "(&(distinguishedName=" + dn + ")(objectclass=group))";
+	HashMap<String, Attribute> map = null;
+	SearchControls srchCntrls = ldapClient.constraints;
+	srchCntrls.setReturningAttributes(reverseAttrs);
+	NamingEnumeration<SearchResult> results;
+	try {
+		results = ldapClient.ldapCtx.search(baseDn, filter, srchCntrls);
+		map = new HashMap<String, Attribute>();
+		while (results.hasMore()) {
+			SearchResult searchResult = results.next();
+			NamingEnumeration<? extends Attribute> attrEnum = searchResult.getAttributes().getAll();
+			while (attrEnum.hasMore()) {
+				Attribute att = attrEnum.next();
+				map.put(att.getID(), att);
+			}
+			return map;
+		}
+	} catch (NamingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	return map;
+}
 
 	/**
 	 * @param ldapClient
