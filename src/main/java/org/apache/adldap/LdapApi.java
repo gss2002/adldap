@@ -1581,6 +1581,52 @@ public Map<String, Attribute> getGroupDNAttrs(LdapClient ldapClient, String base
         return null;
       }
     
+    /**
+     * @param ldapClient
+     * @param baseDn
+     * @param samAccountName
+     * @return String description
+     */
+    public String getDescription(LdapClient ldapClient, String baseDn, String samAccountName) {
+
+            String filter = "(samAccountName=" + samAccountName + ")";
+            NamingEnumeration<SearchResult> results;
+            try {
+                    results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
+                    while (results.hasMore()) {
+                            SearchResult searchResult = results.next();
+                            Attributes attributes = searchResult.getAttributes();
+                            Attribute attr = attributes.get("description");
+                            if (attr != null) {
+                                    String description = (String) attr.get();
+                                    return description;
+                            }
+                    }
+            } catch (NamingException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+            }
+            return null;
+    }
+
+    /**
+     * @param searchResults
+     * @return String description
+     */
+    public String getDescription(Map<String, Attribute> searchResults) {
+            Attribute attr = searchResults.get("description");
+            if (attr != null) {
+                    try {
+                            String description = (String) attr.get();
+                            return description;
+                    } catch (NamingException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                    }
+            }
+            return null;
+    }
+    
     public String convertToByteString(byte[] objectGUID) {
         StringBuilder result = new StringBuilder();
  
