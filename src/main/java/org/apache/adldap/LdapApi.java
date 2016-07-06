@@ -47,7 +47,7 @@ public class LdapApi {
 			"msDS-User-Account-Control-Computed", "msDS-UserPasswordExpiryTimeComputed", "name", "objectCategory",
 			"objectGUID", "objectSid", "primaryGroupID", "sAMAccountName", "sDRightsEffective", "sn", "st",
 			"telephoneNumber", "userAccountControl", "userPrincipalName", "uSNChanged", "uSNCreated", "whenChanged",
-			"whenCreated" };
+			"whenCreated","pwdLastSet" };
 	String[] globalGroupCatalogAttrs = { "canonicalName", "cn", "createTimeStamp", "description", "displayName",
 			"distinguishedName", "groupType", "mail", "member",
 			"modifyTimeStamp", "msDS-parentdistname", "msDS-PrincipalName", "name", "objectCategory",
@@ -134,7 +134,7 @@ public class LdapApi {
 	 * @return String mail
 	 */
 	public String getUserMail(LdapClient ldapClient, String baseDn, String samAccountName) {
-		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
@@ -180,7 +180,7 @@ public class LdapApi {
 	 * @return String uSNChanged
 	 */
 	public String getUSNChanged(LdapClient ldapClient, String baseDn, String samAccountName) {
-		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
@@ -226,7 +226,7 @@ public class LdapApi {
 	 * @return String uSNCreated
 	 */
 	public String getUSNCreated(LdapClient ldapClient, String baseDn, String samAccountName) {
-		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
@@ -272,7 +272,7 @@ public class LdapApi {
 	 * @return String cn
 	 */
 	public String getCN(LdapClient ldapClient, String baseDn, String samAccountName) {
-		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
@@ -319,7 +319,7 @@ public class LdapApi {
 	 * @return String distinguishedName
 	 */
 	public String getDN(LdapClient ldapClient, String baseDn, String samAccountName) {
-		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
@@ -365,7 +365,7 @@ public class LdapApi {
 	 * @return String manager
 	 */
 	public String getManager(LdapClient ldapClient, String baseDn, String samAccountName) {
-		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
@@ -412,7 +412,7 @@ public class LdapApi {
 	 */
 	public String getWhenChanged(LdapClient ldapClient, String baseDn, String samAccountName) {
 
-		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
@@ -459,7 +459,7 @@ public class LdapApi {
 	 */
 	public String getModifyTimeStamp(LdapClient ldapClient, String baseDn, String samAccountName) {
 
-		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
@@ -507,7 +507,7 @@ public class LdapApi {
 	 */
 	public String getCreateTimeStamp(LdapClient ldapClient, String baseDn, String samAccountName) {
 
-		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
@@ -555,7 +555,7 @@ public class LdapApi {
 	 */
 	public String getWhenCreated(LdapClient ldapClient, String baseDn, String samAccountName) {
 
-		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
@@ -878,7 +878,7 @@ public class LdapApi {
 	 */
 	public String getDisplayName(LdapClient ldapClient, String baseDn, String samAccountName) {
 
-		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
@@ -934,6 +934,190 @@ public class LdapApi {
 		return null;
 	}
 	
+	
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName
+	 * @return String st
+	 */
+	public String getSt(LdapClient ldapClient, String baseDn, String samAccountName) {
+
+		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("st");
+				if (attr != null) {
+					String st = (String) attr.get();
+					return st;
+				}
+			}
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * @param searchResults
+	 * @return String st
+	 */
+	public String getSt(Map<String, Attribute> searchResults) {
+		Attribute attr = searchResults.get("st");
+		if (attr != null) {
+			try {
+				String st = (String) attr.get();
+				return st;
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName
+	 * @return String location
+	 */
+	public String getLocation(LdapClient ldapClient, String baseDn, String samAccountName) {
+
+		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("l");
+				if (attr != null) {
+					String l = (String) attr.get();
+					return l;
+				}
+			}
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * @param searchResults
+	 * @return String location
+	 */
+	public String getLocation(Map<String, Attribute> searchResults) {
+		Attribute attr = searchResults.get("l");
+		if (attr != null) {
+			try {
+				String l = (String) attr.get();
+				return l;
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName
+	 * @return String location
+	 */
+	public String getCountry(LdapClient ldapClient, String baseDn, String samAccountName) {
+
+		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("c");
+				if (attr != null) {
+					String c = (String) attr.get();
+					return c;
+				}
+			}
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * @param searchResults
+	 * @return String country
+	 */
+	public String getCountry(Map<String, Attribute> searchResults) {
+		Attribute attr = searchResults.get("l");
+		if (attr != null) {
+			try {
+				String c = (String) attr.get();
+				return c;
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName
+	 * @return String objectGuid
+	 */
+	public String getObjectGuid(LdapClient ldapClient, String baseDn, String samAccountName) {
+
+		String filter = "(samAccountName=" + samAccountName + ")";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("objectGUID");
+				if (attr != null) {
+					byte[] objectGUID = (byte[]) attr.get();
+					return convertToBindingString(objectGUID);
+				}
+			}
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * @param searchResults
+	 * @return String objectGuid
+	 */
+	public String getObjectGuid(Map<String, Attribute> searchResults) {
+		Attribute attr = searchResults.get("objectGUID");
+		if (attr != null) {
+			try {
+				byte[] objectGUID = (byte[]) attr.get();
+				return convertToBindingString(objectGUID);
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
 	
 	/**
 	 * @param ldapClient
@@ -1369,6 +1553,96 @@ public Map<String, Attribute> getGroupDNAttrs(LdapClient ldapClient, String base
 			return false;
 		}
 	}
+    
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param cn
+	 * @return String samAccountName
+	 */
+    public String getSamAccountNameFromCN(LdapClient ldapClient, String baseDn, String cn ) {
+        String filter = "(&(cn="+cn+")(objectclass=person))";
+        NamingEnumeration<SearchResult> results;
+        try {
+      	  			results = ldapClient.ldapCtx.search(baseDn, filter, ldapClient.constraints);
+                      while (results.hasMore()) {
+                              SearchResult searchResult = results.next();
+                              Attributes attributes = searchResult.getAttributes();
+                              Attribute attr = attributes.get("sAMAccountName");
+                              if (attr != null) {
+                              	String samAccountName = (String) attr.get();
+                              	return samAccountName;
+                              }
+                      }
+                } catch (NamingException e) {
+                      // TODO Auto-generated catch block
+                      e.printStackTrace();
+                }
+        return null;
+      }
+    
+    public String convertToByteString(byte[] objectGUID) {
+        StringBuilder result = new StringBuilder();
+ 
+        for (int i = 0; i < objectGUID.length; i++) {
+            String transformed = prefixZeros((int) objectGUID[i] & 0xFF);
+            result.append("\\");
+            result.append(transformed);
+        }
+ 
+        return result.toString();
+    }
+ 
+    public String convertToBindingString(byte[] objectGUID) {
+        StringBuilder displayStr = new StringBuilder();
+ 
+        displayStr.append("<GUID=");
+        displayStr.append(convertToDashedString(objectGUID));
+        displayStr.append(">");
+ 
+        return displayStr.toString();
+    }
+ 
+    public String convertToDashedString(byte[] objectGUID) {
+        StringBuilder displayStr = new StringBuilder();
+ 
+        displayStr.append(prefixZeros((int) objectGUID[3] & 0xFF));
+        displayStr.append(prefixZeros((int) objectGUID[2] & 0xFF));
+        displayStr.append(prefixZeros((int) objectGUID[1] & 0xFF));
+        displayStr.append(prefixZeros((int) objectGUID[0] & 0xFF));
+        displayStr.append("-");
+        displayStr.append(prefixZeros((int) objectGUID[5] & 0xFF));
+        displayStr.append(prefixZeros((int) objectGUID[4] & 0xFF));
+        displayStr.append("-");
+        displayStr.append(prefixZeros((int) objectGUID[7] & 0xFF));
+        displayStr.append(prefixZeros((int) objectGUID[6] & 0xFF));
+        displayStr.append("-");
+        displayStr.append(prefixZeros((int) objectGUID[8] & 0xFF));
+        displayStr.append(prefixZeros((int) objectGUID[9] & 0xFF));
+        displayStr.append("-");
+        displayStr.append(prefixZeros((int) objectGUID[10] & 0xFF));
+        displayStr.append(prefixZeros((int) objectGUID[11] & 0xFF));
+        displayStr.append(prefixZeros((int) objectGUID[12] & 0xFF));
+        displayStr.append(prefixZeros((int) objectGUID[13] & 0xFF));
+        displayStr.append(prefixZeros((int) objectGUID[14] & 0xFF));
+        displayStr.append(prefixZeros((int) objectGUID[15] & 0xFF));
+ 
+        return displayStr.toString();
+    }
+ 
+    private String prefixZeros(int value) {
+        if (value <= 0xF) {
+            StringBuilder sb = new StringBuilder("0");
+            sb.append(Integer.toHexString(value));
+ 
+            return sb.toString();
+ 
+        } else {
+            return Integer.toHexString(value);
+        }
+    }
+    
+
 
 	static void printAttrs(Attributes attrs) {
 		if (attrs == null) {

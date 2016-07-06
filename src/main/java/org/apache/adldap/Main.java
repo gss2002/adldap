@@ -12,10 +12,10 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		String baseDn = "OU=INTERNAL,dc=hdpusr,dc=senia,dc=org";
-		String bindDn = "cn=ldapsearch,ou=internal,dc=hdpusr,dc=senia,dc=org";
+		String baseDn = "dc=hdpusr,dc=senia,dc=org";
+		String bindDn = "";
 		String bindPw = "";
-		String ldapURL = "ldaps://seniadc1.senia.org:3269";
+		String ldapURL = "ldaps://seniadc1.hdpusr.senia.org:3269";
 		String samAccountName = "";
 		String groupSamAccountName = "";
 		LdapClient ldpClient = new LdapClient(baseDn, bindDn, bindPw, ldapURL);
@@ -30,6 +30,9 @@ public class Main {
 		System.out.println("DN: "+api.getDN(results));
 
 		System.out.println("Manger: "+api.getManager(results));
+
+		System.out.println("ObjectGUID: "+api.getObjectGuid(results));
+
 
 		
 		System.out.println("UPN: "+api.getUPN(results));

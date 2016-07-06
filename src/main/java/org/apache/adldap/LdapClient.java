@@ -73,6 +73,7 @@ public class LdapClient {
         this.env.put(Context.SECURITY_AUTHENTICATION, "simple");
         this.env.put(Context.SECURITY_PRINCIPAL, this.bindDN);
         this.env.put(Context.SECURITY_CREDENTIALS, this.bindPW);
+        this.env.put("java.naming.ldap.attributes.binary", "objectGUID");
 		try {
 			ldapCtx = new InitialDirContext(this.env);
 	    	this.constraints = new SearchControls();
