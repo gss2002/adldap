@@ -18,8 +18,7 @@ public class Main {
 		String ldapURL = "ldaps://seniadc1.hdpusr.senia.org:3269";
 		String samAccountName = "";
 		String groupSamAccountName = "";
-		LdapClient ldpClient = new LdapClient(baseDn, bindDn, bindPw, ldapURL);
-
+		LdapClient ldpClient = new LdapClientSimple(baseDn, bindDn, bindPw, ldapURL);
 		LdapApi api = new LdapApi();
 		Map<String,Attribute> groupResults = api.getADGroupGCAttrs(ldpClient, baseDn, groupSamAccountName);
 		Map<String,Attribute> results = api.getADUserGCAttrs(ldpClient, baseDn, samAccountName);
@@ -30,7 +29,7 @@ public class Main {
 		System.out.println("DN: "+api.getDN(results));
 
 		System.out.println("Manger: "+api.getManager(results));
-
+		
 		System.out.println("ObjectGUID: "+api.getObjectGuid(results));
 
 
@@ -112,7 +111,7 @@ public class Main {
 
 
 
-		ldpClient.destroyLdapClient();
+		//ldpClient.destroyLdapClient();
 
 		}
 	}
