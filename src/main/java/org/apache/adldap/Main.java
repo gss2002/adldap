@@ -15,7 +15,7 @@ public class Main {
 		String baseDn = "dc=hdpusr,dc=senia,dc=org";
 		String bindDn = "";
 		String bindPw = "";
-		String ldapURL = "ldaps://seniadc1.hdpusr.senia.org:3269";
+		String ldapURL = "";
 		String samAccountName = "";
 		String groupSamAccountName = "";
 		LdapClient ldpClient = new LdapClientSimple(baseDn, bindDn, bindPw, ldapURL);

@@ -16,13 +16,13 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LdapApi {
 
-	Logger LOG = Logger.getLogger(LdapApi.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DnsLookup.class);
 
-	
 	// some useful constants from lmaccess.h
 	int UF_SCRIPT = 0x001;
 	int UF_ACCOUNTDISABLE = 0x0002;
@@ -58,7 +58,6 @@ public class LdapApi {
 			"msDS-PrincipalName", "name", "objectCategory", "objectGUID", "objectSid", "sAMAccountName",
 			"sDRightsEffective", "uSNChanged", "uSNCreated", "whenChanged", "whenCreated" };
 
-	
 	String[] reverseAttrs = { "sAMAccountName", "cn" };
 
 	/**
@@ -1302,7 +1301,7 @@ public class LdapApi {
 					NamingEnumeration<?> attrEnum = attr.getAll();
 					while (attrEnum.hasMore()) {
 						String group = attrEnum.next().toString();
-						LOG.debug("memberof: "+group);
+						LOG.debug("memberof: " + group);
 						groupList.add(group);
 					}
 					return groupList;
@@ -1338,7 +1337,7 @@ public class LdapApi {
 					NamingEnumeration<?> attrEnum = attr.getAll();
 					while (attrEnum.hasMore()) {
 						String group = attrEnum.next().toString();
-						LOG.debug("member: "+group);
+						LOG.debug("member: " + group);
 						groupList.add(group);
 					}
 					if (results != null)
@@ -1354,12 +1353,12 @@ public class LdapApi {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @param ldapClient
 	 * @param baseDn
 	 * @param samAccountName
-	 * @return 
+	 * @return
 	 */
 	public List<String> getGroupMemberRanging(LdapClient ldapClient, String baseDn, String samAccountName) {
 		List<String> groupList = new ArrayList<String>();
@@ -1367,28 +1366,26 @@ public class LdapApi {
 		boolean endString = true;
 		int loopValue = 0;
 		while (endString) {
-		    int startValue = loopValue * 1000;
-		    int endvalue = (loopValue + 1) * 1000;
-		    String[] returnedAttrs = new String[1];
-		    String range = startValue + "-" + endvalue;
-		    returnedAttrs[0] = "member;range=" + range;
-		    String memberAttr = "member;range=" + range;
-		    SearchControls searchCtls = ldapClient.getLdapBean().getConstraints();
-		    searchCtls.setReturningAttributes(returnedAttrs);
-		    NamingEnumeration<SearchResult> answer;
+			int startValue = loopValue * 1000;
+			int endvalue = (loopValue + 1) * 1000;
+			String[] returnedAttrs = new String[1];
+			String range = startValue + "-" + endvalue;
+			returnedAttrs[0] = "member;range=" + range;
+			String memberAttr = "member;range=" + range;
+			SearchControls searchCtls = ldapClient.getLdapBean().getConstraints();
+			searchCtls.setReturningAttributes(returnedAttrs);
+			NamingEnumeration<SearchResult> answer;
 			try {
-				answer = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,
-						searchCtls);
+				answer = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter, searchCtls);
 				while (answer.hasMore()) {
 					SearchResult searchResult = (SearchResult) answer.next();
-					//System.out.println(entry.getAttributes());
 					Attributes attributes = searchResult.getAttributes();
 					Attribute attr = attributes.get(memberAttr);
 					if (attr != null) {
 						NamingEnumeration<?> attrEnum = attr.getAll();
 						while (attrEnum.hasMore()) {
 							String group = attrEnum.next().toString();
-							LOG.debug("member: "+group);
+							LOG.debug("member: " + group);
 							groupList.add(group);
 						}
 					}
@@ -1397,7 +1394,7 @@ public class LdapApi {
 					}
 				}
 				loopValue++;
-				//return groupList;
+				// return groupList;
 			} catch (NamingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -1419,7 +1416,7 @@ public class LdapApi {
 				attrEnum = attr.getAll();
 				while (attrEnum.hasMore()) {
 					String group = attrEnum.next().toString();
-					LOG.debug("member: "+group);
+					LOG.debug("member: " + group);
 					groupList.add(group);
 				}
 				return groupList;
@@ -1439,7 +1436,7 @@ public class LdapApi {
 	public boolean groupRangingExists(Map<String, Attribute> searchResults) {
 		Attribute attr = searchResults.get("member");
 		if (attr != null) {
-			LOG.debug("Ranging: "+attr.size());
+			LOG.debug("Ranging: " + attr.size());
 			if (attr.size() == 0) {
 				LOG.debug("AttrSize: 0");
 				return true;
@@ -1449,7 +1446,7 @@ public class LdapApi {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * @param searchResults
 	 * @return List memberOf
@@ -1463,7 +1460,7 @@ public class LdapApi {
 				attrEnum = attr.getAll();
 				while (attrEnum.hasMore()) {
 					String group = attrEnum.next().toString();
-					LOG.debug("memberof: "+group);
+					LOG.debug("memberof: " + group);
 					groupList.add(group);
 				}
 				return groupList;
@@ -1581,7 +1578,7 @@ public class LdapApi {
 				NamingEnumeration<? extends Attribute> attrEnum = searchResult.getAttributes().getAll();
 				while (attrEnum.hasMore()) {
 					Attribute att = attrEnum.next();
-					LOG.debug("Attribute Id: "+att.getID()+" Attribute: "+att);
+					LOG.debug("Attribute Id: " + att.getID() + " Attribute: " + att);
 					map.put(att.getID(), att);
 				}
 				return map;
@@ -1908,16 +1905,16 @@ public class LdapApi {
 
 	static void printAttrs(Attributes attrs) {
 		if (attrs == null) {
-			System.out.println("No attributes");
+			LOG.debug("No attributes");
 		} else {
 			/* Print each attribute */
 			try {
 				for (NamingEnumeration ae = attrs.getAll(); ae.hasMore();) {
 					Attribute attr = (Attribute) ae.next();
-					System.out.println("attribute: " + attr.getID());
+					LOG.debug("attribute: " + attr.getID());
 
 					/* print each value */
-					for (NamingEnumeration e = attr.getAll(); e.hasMore(); System.out.println("value: " + e.next()))
+					for (NamingEnumeration e = attr.getAll(); e.hasMore(); LOG.debug("value: " + e.next()))
 						;
 				}
 			} catch (NamingException e) {

@@ -6,6 +6,10 @@ import javax.security.auth.Subject;
 import javax.security.auth.kerberos.KerberosTicket;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
@@ -17,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class KerberosClient {
+	private static final Logger LOG = LoggerFactory.getLogger(KerberosClient.class);
+
 	private final static String JAAS_IBM = "JaasIBM";
 	private final static String JAAS_SUN = "JaasSUN";
 	Subject subject;
@@ -38,35 +44,35 @@ public class KerberosClient {
 		this.upn = upn;
 		this.upnPw = upnPw;
 		this.upnKeyTab = upnKeyTab;
-		System.out.println("InitContext Start: " + System.currentTimeMillis());
+		LOG.debug("InitContext Start: " + System.currentTimeMillis());
 		reinitContext();
-		System.out.println("InitContext Complete: " + System.currentTimeMillis());
+		LOG.debug("InitContext Complete: " + System.currentTimeMillis());
 	}
 	public KerberosClient(String upn) {
 		this.upn = upn;
-		System.out.println("InitContext Start: " + System.currentTimeMillis());
+		LOG.debug("InitContext Start: " + System.currentTimeMillis());
 		reinitContext();
-		System.out.println("InitContext Complete: " + System.currentTimeMillis());
+		LOG.debug("InitContext Complete: " + System.currentTimeMillis());
 	}
 	
 	public void reinitContext() {
-		System.out.println("InitContext Start: " + System.currentTimeMillis());
+		LOG.debug("InitContext Start: " + System.currentTimeMillis());
 		if (this.upnPw != null && this.upnKeyTab == null) {
-			System.out.println("UPN w/Password: " + System.currentTimeMillis());
+			LOG.debug("UPN w/Password: " + System.currentTimeMillis());
 			this.initContextUp(this.upn, this.upnPw);
 		}
 		if (this.upnPw == null && this.upnKeyTab != null) {
-			System.out.println("UPN w/keytab: " + System.currentTimeMillis());
-			System.out.println("UPN w/keytab: " +this.upnKeyTab);
-			System.out.println("UPN: " +this.upn);
+			LOG.debug("UPN w/keytab: " + System.currentTimeMillis());
+			LOG.debug("UPN w/keytab: " +this.upnKeyTab);
+			LOG.debug("UPN: " +this.upn);
 
 			this.initContextKeyTab(this.upn, this.upnKeyTab);
 		}
 		if (this.upnPw == null && this.upnKeyTab == null && this.upn != null) {
-			System.out.println("UPN: " +this.upn);
+			LOG.debug("UPN: " +this.upn);
 			this.initContextCCcache(this.upn);
 		}
-		System.out.println("InitContext Complete: " + System.currentTimeMillis());
+		LOG.debug("InitContext Complete: " + System.currentTimeMillis());
 	}
 
 	public Subject getSubject() {
@@ -94,14 +100,14 @@ public class KerberosClient {
 			}
 		} catch (LoginException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error(e.getMessage());
 		}
 
 		// Log the Context in
 		try {
-			System.out.println("ContextLogin Start: " + System.currentTimeMillis());
+			LOG.debug("ContextLogin Start: " + System.currentTimeMillis());
 			context.login();
-			System.out.println("ContextLogin Complete: " + System.currentTimeMillis());
+			LOG.debug("ContextLogin Complete: " + System.currentTimeMillis());
 
 		} catch (LoginException e) {
 			// TODO Auto-generated catch block
@@ -110,7 +116,7 @@ public class KerberosClient {
 
 		// Obtain the Sec SUJECT FROM THE LOGINCONTEXT!!!
 		this.subject = context.getSubject();
-		System.out.println("getSubject Complete: " + System.currentTimeMillis());
+		LOG.debug("getSubject Complete: " + System.currentTimeMillis());
 
 	}
 	
@@ -136,18 +142,18 @@ public class KerberosClient {
 
 		// Log the Context in
 		try {
-			System.out.println("ContextLogin Start: " + System.currentTimeMillis());
+			LOG.debug("ContextLogin Start: " + System.currentTimeMillis());
 			context.login();
-			System.out.println("ContextLogin Complete: " + System.currentTimeMillis());
+			LOG.debug("ContextLogin Complete: " + System.currentTimeMillis());
 
 		} catch (LoginException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error(e.getMessage());
 		}
 
 		// Obtain the Sec SUJECT FROM THE LOGINCONTEXT!!!
 		this.subject = context.getSubject();
-		System.out.println("getSubject Complete: " + System.currentTimeMillis());
+		LOG.debug("getSubject Complete: " + System.currentTimeMillis());
 
 	}
 	
@@ -168,23 +174,23 @@ public class KerberosClient {
 			}
 		} catch (LoginException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error(e.getMessage());
 		}
 
 		// Log the Context in
 		try {
-			System.out.println("ContextLogin Start: " + System.currentTimeMillis());
+			LOG.debug("ContextLogin Start: " + System.currentTimeMillis());
 			context.login();
-			System.out.println("ContextLogin Complete: " + System.currentTimeMillis());
+			LOG.debug("ContextLogin Complete: " + System.currentTimeMillis());
 
 		} catch (LoginException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error(e.getMessage());
 		}
 
 		// Obtain the Sec SUJECT FROM THE LOGINCONTEXT!!!
 		this.subject = context.getSubject();
-		System.out.println("getSubject Complete: " + System.currentTimeMillis());
+		LOG.debug("getSubject Complete: " + System.currentTimeMillis());
 
 	}
 
@@ -261,7 +267,7 @@ public class KerberosClient {
 								new AppConfigurationEntry("com.ibm.security.auth.module.Krb5LoginModule",
 										LoginModuleControlFlag.REQUIRED, options) });
 			} else {
-				System.out.println("User:"+user);
+				LOG.debug("User:"+user);
 				options.put("principal", user);
 				options.put("debug", "false");
 				options.put("useTicketCache", "false");
@@ -308,7 +314,7 @@ public class KerberosClient {
 									new AppConfigurationEntry("com.ibm.security.auth.module.Krb5LoginModule",
 											LoginModuleControlFlag.REQUIRED, options) });
 				} else {
-					System.out.println("User:" + user);
+					LOG.debug("User:" + user);
 					options.put("principal", user);
 					options.put("debug", "false");
 					options.put("useTicketCache", "true");
