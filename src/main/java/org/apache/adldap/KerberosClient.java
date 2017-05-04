@@ -19,9 +19,7 @@
 package org.apache.adldap;
 
 import javax.naming.directory.InitialDirContext;
-import javax.naming.directory.SearchControls;
 import javax.security.auth.Subject;
-import javax.security.auth.kerberos.KerberosTicket;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
 
@@ -31,12 +29,9 @@ import org.slf4j.LoggerFactory;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import java.security.Principal;
-
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Set;
 
 public class KerberosClient {
 	private static final Logger LOG = LoggerFactory.getLogger(KerberosClient.class);

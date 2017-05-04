@@ -59,6 +59,12 @@ public class LdapClientSASLImpl implements PrivilegedAction<Object> {
 		this.env = new Hashtable<String, Object>();
 	    this.env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         this.env.put(Context.PROVIDER_URL, this.ldapUrl);
+        if (System.getProperty("ldap.ssl") != null) {
+        	if (System.getProperty("ldap.ssl").equalsIgnoreCase("true")) {
+        		this.env.put(Context.SECURITY_PROTOCOL, "ssl");
+        		this.env.put("java.naming.ldap.factory.socket", LdapTrustManager.LdapSSLSocketFactory.class.getName());
+        	}
+        }
         this.env.put(Context.SECURITY_AUTHENTICATION, "GSSAPI");
         this.env.put("java.naming.ldap.attributes.binary", "objectGUID");
         this.env.put("javax.security.sasl.server.authentication", "true");

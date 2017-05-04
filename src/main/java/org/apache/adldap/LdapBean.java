@@ -18,8 +18,6 @@
 
 package org.apache.adldap;
 
-import java.util.Hashtable;
-
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.security.auth.Subject;
