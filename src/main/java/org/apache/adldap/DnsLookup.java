@@ -83,7 +83,7 @@ public class DnsLookup {
 			LOG.error(e.getMessage());
 		}
 		try {
-			Attributes attrs = ctx.getAttributes("_kerberos._tcp.gaadc._sites." + domain, SRV_ATTRIBS);
+			Attributes attrs = ctx.getAttributes("_kerberos._tcp." + domain, SRV_ATTRIBS);
 			Attribute attr = attrs.get(SRV_ATTRIB);
 
 			if (attr != null) {

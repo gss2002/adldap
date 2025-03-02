@@ -43,7 +43,7 @@ public class LdapApi {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DnsLookup.class);
 
-	long neverExpires = 9223372036854775807L;	
+	long neverExpires = 9223372036854775807L;
 	// some useful constants from lmaccess.h
 	int UF_SCRIPT = 0x001;
 	int UF_ACCOUNTDISABLE = 0x0002;
@@ -72,8 +72,8 @@ public class LdapApi {
 			"msDS-User-Account-Control-Computed", "msDS-UserPasswordExpiryTimeComputed", "name", "objectCategory",
 			"objectGUID", "objectSid", "primaryGroupID", "sAMAccountName", "sDRightsEffective", "sn", "st",
 			"telephoneNumber", "userAccountControl", "userPrincipalName", "uSNChanged", "uSNCreated", "whenChanged",
-			"whenCreated", "pwdLastSet", "badPasswordTime", "badPwdCount",
-			"lockoutTime", "accountExpires", "ipPhone", "division", "logonCount", "department", "title" };
+			"whenCreated", "pwdLastSet", "badPasswordTime", "badPwdCount", "lockoutTime", "accountExpires", "ipPhone",
+			"division", "logonCount", "department", "title" };
 	String[] globalGroupCatalogAttrs = { "canonicalName", "cn", "createTimeStamp", "description", "displayName",
 			"distinguishedName", "groupType", "mail", "member", "modifyTimeStamp", "msDS-parentdistname",
 			"msDS-PrincipalName", "name", "objectCategory", "objectGUID", "objectSid", "sAMAccountName",
@@ -88,7 +88,7 @@ public class LdapApi {
 	public String parseLdapDate(String ldapDate) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-		
+
 		SimpleDateFormat sdfOut = new SimpleDateFormat();
 		sdfOut.setTimeZone(new SimpleTimeZone(0, "GMT"));
 		sdfOut.applyPattern("dd MMM yyyy HH:mm:ss z");
@@ -96,7 +96,6 @@ public class LdapApi {
 		try {
 			return sdfOut.format(sdf.parse(ldapDate));
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ldapDate;
@@ -121,17 +120,17 @@ public class LdapApi {
 	}
 
 	/**
-	* @param ldapClient
-	* @param baseDn
-	* @param samAccountName
-	* @return String ipPhone
-	*/
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName
+	 * @return String ipPhone
+	 */
 	public String getIpPhone(LdapClient ldapClient, String baseDn, String samAccountName) {
 		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,
-			ldapClient.getLdapBean().getConstraints());
+					ldapClient.getLdapBean().getConstraints());
 			while (results.hasMore()) {
 				SearchResult searchResult = results.next();
 				Attributes attributes = searchResult.getAttributes();
@@ -146,17 +145,16 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
 	}
 
 	/**
-	* @param searchResults
-	* @return String ipPhone
-	*/
-	public String getIpPhone(Map<String, Attribute > searchResults) {
+	 * @param searchResults
+	 * @return String ipPhone
+	 */
+	public String getIpPhone(Map<String, Attribute> searchResults) {
 		Attribute attr = searchResults.get("ipPhone");
 		if (attr != null) {
 			String ipPhone = null;
@@ -164,56 +162,54 @@ public class LdapApi {
 				ipPhone = (String) attr.get();
 				return ipPhone;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		return null;
 	}
+
 	/**
-        * @param ldapClient
-        * @param baseDn
-        * @param samAccountName
-	* @return String title
-	*/
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName
+	 * @return String title
+	 */
 	public String getTitle(LdapClient ldapClient, String baseDn, String samAccountName) {
 		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,
-			ldapClient.getLdapBean().getConstraints());
-			while (results.hasMore()) {|
+					ldapClient.getLdapBean().getConstraints());
+			while (results.hasMore()) {
 				SearchResult searchResult = results.next();
 				Attributes attributes = searchResult.getAttributes();
 				Attribute attr = attributes.get("title");
 				if (attr != null) {
 					String title = (String) attr.get();
 					if (results != null)
-						results.close ();
+						results.close();
 					return title;
 				}
 			}
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
-	｝
+	}
 
 	/**
-	* @param searchResults
-	* @return String title
-	*/
-	public String getTitle(Map<String, Attribute > searchResults) {
+	 * @param searchResults
+	 * @return String title
+	 */
+	public String getTitle(Map<String, Attribute> searchResults) {
 		Attribute attr = searchResults.get("title");
 		if (attr != null) {
 			try {
 				String title = (String) attr.get();
 				return title;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -246,7 +242,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -264,7 +259,6 @@ public class LdapApi {
 				telephoneNumber = (String) attr.get();
 				return telephoneNumber;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -295,56 +289,54 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-        /**
-        * @param ldapClient
-        * @param baseDn
-        * @param samAccountName
-	* @return String division
-	*/
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName
+	 * @return String division
+	 */
 	public String getDivision(LdapClient ldapClient, String baseDn, String samAccountName) {
 		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,
-			ldapClient.getLdapBean().getConstraints());
+					ldapClient.getLdapBean().getConstraints());
 			while (results.hasMore()) {
 				SearchResult searchResult = results.next();
 				Attributes attributes = searchResult.getAttributes();
 				Attribute attr = attributes.get("division");
 				if (attr != null) {
 					String division = (String) attr.get();
-				if (results != null)
-					results.close();
-				return division;
+					if (results != null)
+						results.close();
+					return division;
+				}
 			}
-			if (results l= null)
+			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-        /**
-        * @param searchResults
-        * @return String division
-        */
+	/**
+	 * @param searchResults
+	 * @return String division
+	 */
 
-	public String getDivision (Map<String, Attribute > searchResults) {
+	public String getDivision(Map<String, Attribute> searchResults) {
 		Attribute attr = searchResults.get("division");
 		if (attr != null) {
 			try {
 				String division = (String) attr.get();
 				return division;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -352,20 +344,21 @@ public class LdapApi {
 	}
 
 	/**
-	* @param ldapClient
-	* @param baseDn|
-	* @param samAccountName
-	* @return String department
-	*/
+	 * @param ldapClient
+	 * @param baseDn|
+	 * @param samAccountName
+	 * @return String department
+	 */
 	public String getDepartment(LdapClient ldapClient, String baseDn, String samAccountName) {
 		String filter = "(samAccountName=" + samAccountName + ")";
 		NamingEnumeration<SearchResult> results;
 		try {
-			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter, ldapClient.getLdapBean().getConstraints());
+			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,
+					ldapClient.getLdapBean().getConstraints());
 			while (results.hasMore()) {
 				SearchResult searchResult = results.next();
 				Attributes attributes = searchResult.getAttributes();
-				Attribute attr = attributes.get ("department");
+				Attribute attr = attributes.get("department");
 				if (attr != null) {
 					String department = (String) attr.get();
 					if (results != null)
@@ -376,24 +369,22 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
 	}
 
 	/**
-	* @param searchResults
-	* @return String department
-	*/
+	 * @param searchResults
+	 * @return String department
+	 */
 	public String getDepartment(Map<String, Attribute> searchResults) {
-		Attribute attr = searchResults.get ("department");
+		Attribute attr = searchResults.get("department");
 		if (attr != null) {
 			try {
 				String department = (String) attr.get();
 				return department;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -412,58 +403,89 @@ public class LdapApi {
 				mail = (String) attr.get();
 				return mail;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		return null;
 	}
 
-        /**
-        * @param searchResults
-        * @return String pwdExpired
-        */
-	public boolean getPwdExpired(Map<String, Attribute> searchResults, boolean pwdNeverExpires) ‹
-		Attribute attr = searchResults.get("msDS-UserPasswordExpiryTimeComputed") );
+	/**
+	 * @param searchResults
+	 * @return String pwdExpired
+	 */
+	public boolean getPwdExpired(Map<String, Attribute> searchResults, boolean pwdNeverExpires) {
+		Attribute attr = searchResults.get("msDS-UserPasswordExpiryTimeComputed");
 		Boolean pwdExpired = false;
 		if (attr != null) {
 			try {
-				long expirationMSDate = Long-parseLong ((String) attr.get());
+				long expirationMSDate = Long.parseLong((String) attr.get());
 				Date expirationDate = parseMSTimeDate(expirationMSDate);
-				long pwdExpiration = expirationDate.getTime ();
-				if (pwdExpiration ›= System.currentTimeMillis()) {
+				long pwdExpiration = expirationDate.getTime();
+				if (pwdExpiration >= System.currentTimeMillis()) {
 					pwdExpired = false;
 				} else {
 					pwdExpired = true;
-				}	
+				}
 				if (pwdNeverExpires) {
 					pwdExpired = false;
 				}
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		return pwdExpired;
 	}
 
-        /**
-        * @param searchResults
-	* @return String accountExpires
-	*/
+	/**
+	 * @param uacc
+	 * @return boolean pwdNTExpired
+	 */
+	public boolean getNTPwdExpired(long uacc) {
+		if ((uacc & UF_PASSWORD_EXPIRED) == UF_PASSWORD_EXPIRED) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * @param String groupTypeValue
+	 * @return String groupType
+	 */
+	public String getGroupTypeString(String groupTypeValue) {
+		if (groupTypeValue.equalsIgnoreCase("-2147483640")) {
+			return "Universal Security Group";
+		} else if (groupTypeValue.equalsIgnoreCase("-2147483644")) {
+			return "Domain Local Security Group";
+		} else if (groupTypeValue.equalsIgnoreCase("-2147483646")) {
+			return "Global Security Group";
+		} else if (groupTypeValue.equalsIgnoreCase("4")) {
+			return "Domain Local Distribution Group";
+		} else if (groupTypeValue.equalsIgnoreCase("8")) {
+			return "Universal Distribution Group";
+		} else if (groupTypeValue.equalsIgnoreCase("2")) {
+			return "Global Distribution Group";
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * @param searchResults
+	 * @return String accountExpires
+	 */
 	public String getAccountExpires(Map<String, Attribute> searchResults) {
-		Attribute attr = searchResults.get ("accountExpires");
+		Attribute attr = searchResults.get("accountExpires");
 		if (attr != null) {
 			try {
-				long accountExpires = Long-parseLong ((String) attr.get());
+				long accountExpires = Long.parseLong((String) attr.get());
 				if (accountExpires == neverExpires) {
 					return "Never";
 				}
 				return parseMSTime(accountExpires);
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
-			｝
+			}
 		}
 		return null;
 	}
@@ -494,7 +516,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -512,7 +533,6 @@ public class LdapApi {
 				uSNChanged = (String) attr.get();
 				return uSNChanged;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -545,7 +565,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -563,7 +582,6 @@ public class LdapApi {
 				uSNCreated = (String) attr.get();
 				return uSNCreated;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -596,7 +614,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -614,7 +631,6 @@ public class LdapApi {
 				cn = (String) attr.get();
 				return cn;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -647,7 +663,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -665,7 +680,6 @@ public class LdapApi {
 				distinguishedName = (String) attr.get();
 				return distinguishedName;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -698,7 +712,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -716,7 +729,6 @@ public class LdapApi {
 				manager = (String) attr.get();
 				return manager;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -750,7 +762,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -768,7 +779,6 @@ public class LdapApi {
 				whenChanged = (String) attr.get();
 				return parseLdapDate(whenChanged);
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -802,7 +812,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -820,7 +829,6 @@ public class LdapApi {
 				modifyTimeStamp = (String) attr.get();
 				return parseLdapDate(modifyTimeStamp);
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -854,7 +862,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -872,7 +879,6 @@ public class LdapApi {
 				createTimestamp = (String) attr.get();
 				return parseLdapDate(createTimestamp);
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -906,7 +912,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -924,7 +929,6 @@ public class LdapApi {
 				whenCreated = (String) attr.get();
 				return parseLdapDate(whenCreated);
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -958,7 +962,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -976,7 +979,6 @@ public class LdapApi {
 				userPrincipalName = (String) attr.get();
 				return userPrincipalName;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1010,7 +1012,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1028,7 +1029,6 @@ public class LdapApi {
 				badPwdCount = (String) attr.get();
 				return badPwdCount;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1062,7 +1062,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1079,7 +1078,6 @@ public class LdapApi {
 				long badPasswordTime = Long.parseLong((String) attr.get());
 				return parseMSTime(badPasswordTime);
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1113,7 +1111,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1130,7 +1127,6 @@ public class LdapApi {
 				long lastLogonTimeStamp = Long.parseLong((String) attr.get());
 				return parseMSTime(lastLogonTimeStamp);
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1164,7 +1160,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1181,7 +1176,6 @@ public class LdapApi {
 				long pwdLastSet = Long.parseLong((String) attr.get());
 				return parseMSTime(pwdLastSet);
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1215,7 +1209,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1232,7 +1225,6 @@ public class LdapApi {
 				long lockoutTime = Long.parseLong((String) attr.get());
 				return parseMSTime(lockoutTime);
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1266,7 +1258,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1283,7 +1274,6 @@ public class LdapApi {
 				String displayName = (String) attr.get();
 				return displayName;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1301,7 +1291,6 @@ public class LdapApi {
 				String sAMAccountName = (String) attr.get();
 				return sAMAccountName;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1335,7 +1324,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1352,7 +1340,6 @@ public class LdapApi {
 				String st = (String) attr.get();
 				return st;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1386,7 +1373,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1403,7 +1389,6 @@ public class LdapApi {
 				String l = (String) attr.get();
 				return l;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1437,7 +1422,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1454,7 +1438,6 @@ public class LdapApi {
 				String c = (String) attr.get();
 				return c;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1488,7 +1471,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1505,7 +1487,6 @@ public class LdapApi {
 				byte[] objectGUID = (byte[]) attr.get();
 				return convertToBindingString(objectGUID);
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1539,7 +1520,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1556,7 +1536,6 @@ public class LdapApi {
 				String description = (String) attr.get();
 				return description;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1593,7 +1572,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1631,7 +1609,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1679,7 +1656,6 @@ public class LdapApi {
 				loopValue++;
 				// return groupList;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1704,7 +1680,6 @@ public class LdapApi {
 				}
 				return groupList;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1748,7 +1723,6 @@ public class LdapApi {
 				}
 				return groupList;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1785,7 +1759,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return uacc;
@@ -1803,7 +1776,6 @@ public class LdapApi {
 				uacc = Long.parseLong((String) attr.get());
 				return uacc;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1835,11 +1807,10 @@ public class LdapApi {
 				return map;
 			}
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return map;
-	}	
+	}
 
 	/**
 	 * @param ldapClient
@@ -1867,7 +1838,6 @@ public class LdapApi {
 				return map;
 			}
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return map;
@@ -1902,17 +1872,17 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return map;
 	}
 
 	String LdapEscape(String ldap) {
-		if (ldap == null)
+		if (ldap == null) {
 			return "";
-		return ldap.replace("\\", "\\5C").replace("*", "\\2A").replace("(", "\\28").replace(")", "\\29").replace("\000","\\00");
 		}
+		return ldap.replace("\\", "\\5C").replace("*", "\\2A").replace("(", "\\28").replace(")", "\\29").replace("\000",
+				"\\00");
 	}
 
 	/**
@@ -1944,7 +1914,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return map;
@@ -1979,7 +1948,6 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return userAccountControl;
@@ -1997,7 +1965,6 @@ public class LdapApi {
 				userAccountControl = Long.parseLong((String) attr.get());
 				return userAccountControl;
 			} catch (NamingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -2126,8 +2093,189 @@ public class LdapApi {
 			if (results != null)
 				results.close();
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param eUPN
+	 * @return String samAccountName
+	 */
+	public String getSamAccountNameFromEUPN(LdapClient ldapClient, String baseDn, String eUPN) {
+		String filter = "(&(userPrincipalName=" + eUPN + ") (|(objectclass=person)(objectclass=group)))";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,
+					ldapClient.getLdapBean().getConstraints());
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("sAMAccountName");
+				if (attr != null) {
+					String samAccountName = (String) attr.get();
+					if (results != null)
+						results.close();
+					return samAccountName;
+				}
+			}
+			if (results != null)
+				results.close();
+		} catch (NamingException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName
+	 * @return String msDS-UserPasswordExpiryTimeComputed
+	 */
+	public String getMsDSUserPasswordExpiryTimeComputed(LdapClient ldapClient, String baseDn, String samAccountName) {
+		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,
+					ldapClient.getLdapBean().getConstraints());
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("msDS-UserPasswordExpiryTimeComputed");
+				if (attr != null) {
+					long msDSUserPasswordExpiryTimeComputed = Long.parseLong((String) attr.get());
+					if (results != null)
+						results.close();
+					if (msDSUserPasswordExpiryTimeComputed == neverExpires) {
+						return "Never";
+					}
+					return parseMSTime(msDSUserPasswordExpiryTimeComputed);
+				}
+			}
+			if (results != null)
+				results.close();
+		} catch (NamingException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * @param searchResults Qreturn String msDS-UserPasswordExpiryTimeComputed
+	 */
+
+	public String getMsDSUserPasswordExpiryTimeComputed(Map<String, Attribute> searchResults) {
+		Attribute attr = searchResults.get("msDS-UserPasswordExpiryTimeComputed");
+		if (attr != null) {
+			try {
+				long msDSUserPasswordExpiryTimeComputed = Long.parseLong((String) attr.get());
+				if (msDSUserPasswordExpiryTimeComputed == neverExpires) {
+					return "Never";
+				}
+				return parseMSTime(msDSUserPasswordExpiryTimeComputed);
+			} catch (NamingException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName Creturn String msDS-KeyVersionNumber
+	 */
+	public String getMsDSKeyVersionNumber(LdapClient ldapClient, String baseDn, String samAccountName) {
+		String filter = "(&(samAccountName=" + samAccountName + ") (objectclass=person))";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,
+					ldapClient.getLdapBean().getConstraints());
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("msDS-KeyVersionNumber");
+				if (attr != null) {
+					String msDSKeyVersionNumber = (String) attr.get();
+					if (results != null)
+						results.close();
+					return msDSKeyVersionNumber;
+				}
+			}
+			if (results != null)
+				results.close();
+		} catch (NamingException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * @param ldapClient
+	 * @param baseDn
+	 * @param samAccountName
+	 * @return String groupType
+	 */
+	public String getGroupType(LdapClient ldapClient, String baseDn, String samAccountName) {
+		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=group))";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,
+					ldapClient.getLdapBean().getConstraints());
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("groupType");
+				if (attr != null) {
+					String groupType = getGroupTypeString((String) attr.get());
+					if (results != null)
+						results.close();
+					return groupType;
+				}
+			}
+			if (results != null)
+				results.close();
+		} catch (NamingException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * @param searchResults
+	 * @return String groupType
+	 */
+	public String getGroupType(Map<String, Attribute> searchResults) {
+		Attribute attr = searchResults.get("groupType");
+		if (attr != null) {
+			String groupType = null;
+			try {
+				groupType = getGroupTypeString((String) attr.get());
+				return groupType;
+			} catch (NamingException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param searchResults
+	 * @return String msDS-KeyVersionNumber
+	 */
+	public String getMsDSKeyVersionNumber(Map<String, Attribute> searchResults) {
+		Attribute attr = searchResults.get("msDS-KeyVersionNumber");
+		if (attr != null) {
+			String msDSKeyVersionNumber = null;
+			try {
+				msDSKeyVersionNumber = (String) attr.get();
+				return msDSKeyVersionNumber;
+			} catch (NamingException e) {
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
@@ -2204,8 +2352,7 @@ public class LdapApi {
 					LOG.debug("attribute: " + attr.getID());
 
 					/* print each value */
-					for (NamingEnumeration e = attr.getAll(); e.hasMore(); LOG.debug("value: " + e.next()))
-						;
+					for (NamingEnumeration e = attr.getAll(); e.hasMore(); LOG.debug("value: " + e.next()));
 				}
 			} catch (NamingException e) {
 				e.printStackTrace();
