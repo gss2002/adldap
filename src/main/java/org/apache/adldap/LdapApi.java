@@ -25,7 +25,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SimpleTimeZone;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -41,6 +43,7 @@ public class LdapApi {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DnsLookup.class);
 
+	long neverExpires = 9223372036854775807L;	
 	// some useful constants from lmaccess.h
 	int UF_SCRIPT = 0x001;
 	int UF_ACCOUNTDISABLE = 0x0002;
@@ -70,7 +73,7 @@ public class LdapApi {
 			"objectGUID", "objectSid", "primaryGroupID", "sAMAccountName", "sDRightsEffective", "sn", "st",
 			"telephoneNumber", "userAccountControl", "userPrincipalName", "uSNChanged", "uSNCreated", "whenChanged",
 			"whenCreated", "pwdLastSet", "badPasswordTime", "badPwdCount",
-			"lockoutTime" };
+			"lockoutTime", "accountExpires", "ipPhone", "division", "logonCount", "department", "title" };
 	String[] globalGroupCatalogAttrs = { "canonicalName", "cn", "createTimeStamp", "description", "displayName",
 			"distinguishedName", "groupType", "mail", "member", "modifyTimeStamp", "msDS-parentdistname",
 			"msDS-PrincipalName", "name", "objectCategory", "objectGUID", "objectSid", "sAMAccountName",
@@ -85,14 +88,18 @@ public class LdapApi {
 	public String parseLdapDate(String ldapDate) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		
+		SimpleDateFormat sdfOut = new SimpleDateFormat();
+		sdfOut.setTimeZone(new SimpleTimeZone(0, "GMT"));
+		sdfOut.applyPattern("dd MMM yyyy HH:mm:ss z");
 
 		try {
-			return sdf.parse(ldapDate).toGMTString();
+			return sdfOut.format(sdf.parse(ldapDate));
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return ldapDate;
 	}
 
 	public String parseMSTime(long ldapTimeStamp) {
@@ -100,7 +107,117 @@ public class LdapApi {
 													// it to java
 		// date Epoch
 		Date lastLogon = new Date(ldapTimeStamp / 10000 - llastLogonAdjust); //
-		return lastLogon.toGMTString();
+		SimpleDateFormat sdf = new SimpleDateFormat();
+		sdf.setTimeZone(new SimpleTimeZone(0, "GMT"));
+		sdf.applyPattern("dd MMM YYYY HH:mm:ss z");
+		return sdf.format(lastLogon);
+	}
+
+	public Date parseMSTimeDate(long ldapTimeStamp) {
+		long llastLogonAdjust = 11644473600000L; // adjust factor for converting
+		// date Epoch
+		Date lastLogon = new Date(ldapTimeStamp / 10000 - llastLogonAdjust); //
+		return lastLogon;
+	}
+
+	/**
+	* @param ldapClient
+	* @param baseDn
+	* @param samAccountName
+	* @return String ipPhone
+	*/
+	public String getIpPhone(LdapClient ldapClient, String baseDn, String samAccountName) {
+		String filter = "(&(samAccountName=" + samAccountName + ")(objectclass=person))";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,
+			ldapClient.getLdapBean().getConstraints());
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("ipPhone");
+				if (attr != null) {
+					String ipPhone = (String) attr.get();
+					if (results != null)
+						results.close();
+					return ipPhone;
+				}
+			}
+			if (results != null)
+				results.close();
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	* @param searchResults
+	* @return String ipPhone
+	*/
+	public String getIpPhone(Map<String, Attribute > searchResults) {
+		Attribute attr = searchResults.get("ipPhone");
+		if (attr != null) {
+			String ipPhone = null;
+			try {
+				ipPhone = (String) attr.get();
+				return ipPhone;
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	/**
+        * @param ldapClient
+        * @param baseDn
+        * @param samAccountName
+	* @return String title
+	*/
+	public String getTitle(LdapClient ldapClient, String baseDn, String samAccountName) {
+		String filter = "(samAccountName=" + samAccountName + ")";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,
+			ldapClient.getLdapBean().getConstraints());
+			while (results.hasMore()) {|
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("title");
+				if (attr != null) {
+					String title = (String) attr.get();
+					if (results != null)
+						results.close ();
+					return title;
+				}
+			}
+			if (results != null)
+				results.close();
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	｝
+
+	/**
+	* @param searchResults
+	* @return String title
+	*/
+	public String getTitle(Map<String, Attribute > searchResults) {
+		Attribute attr = searchResults.get("title");
+		if (attr != null) {
+			try {
+				String title = (String) attr.get();
+				return title;
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -184,6 +301,105 @@ public class LdapApi {
 		return null;
 	}
 
+        /**
+        * @param ldapClient
+        * @param baseDn
+        * @param samAccountName
+	* @return String division
+	*/
+	public String getDivision(LdapClient ldapClient, String baseDn, String samAccountName) {
+		String filter = "(samAccountName=" + samAccountName + ")";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,
+			ldapClient.getLdapBean().getConstraints());
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("division");
+				if (attr != null) {
+					String division = (String) attr.get();
+				if (results != null)
+					results.close();
+				return division;
+			}
+			if (results l= null)
+				results.close();
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+        /**
+        * @param searchResults
+        * @return String division
+        */
+
+	public String getDivision (Map<String, Attribute > searchResults) {
+		Attribute attr = searchResults.get("division");
+		if (attr != null) {
+			try {
+				String division = (String) attr.get();
+				return division;
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	/**
+	* @param ldapClient
+	* @param baseDn|
+	* @param samAccountName
+	* @return String department
+	*/
+	public String getDepartment(LdapClient ldapClient, String baseDn, String samAccountName) {
+		String filter = "(samAccountName=" + samAccountName + ")";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter, ldapClient.getLdapBean().getConstraints());
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get ("department");
+				if (attr != null) {
+					String department = (String) attr.get();
+					if (results != null)
+						results.close();
+					return department;
+				}
+			}
+			if (results != null)
+				results.close();
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	* @param searchResults
+	* @return String department
+	*/
+	public String getDepartment(Map<String, Attribute> searchResults) {
+		Attribute attr = searchResults.get ("department");
+		if (attr != null) {
+			try {
+				String department = (String) attr.get();
+				return department;
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * @param searchResults
 	 * @return String mail
@@ -199,6 +415,55 @@ public class LdapApi {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		return null;
+	}
+
+        /**
+        * @param searchResults
+        * @return String pwdExpired
+        */
+	public boolean getPwdExpired(Map<String, Attribute> searchResults, boolean pwdNeverExpires) ‹
+		Attribute attr = searchResults.get("msDS-UserPasswordExpiryTimeComputed") );
+		Boolean pwdExpired = false;
+		if (attr != null) {
+			try {
+				long expirationMSDate = Long-parseLong ((String) attr.get());
+				Date expirationDate = parseMSTimeDate(expirationMSDate);
+				long pwdExpiration = expirationDate.getTime ();
+				if (pwdExpiration ›= System.currentTimeMillis()) {
+					pwdExpired = false;
+				} else {
+					pwdExpired = true;
+				}	
+				if (pwdNeverExpires) {
+					pwdExpired = false;
+				}
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return pwdExpired;
+	}
+
+        /**
+        * @param searchResults
+	* @return String accountExpires
+	*/
+	public String getAccountExpires(Map<String, Attribute> searchResults) {
+		Attribute attr = searchResults.get ("accountExpires");
+		if (attr != null) {
+			try {
+				long accountExpires = Long-parseLong ((String) attr.get());
+				if (accountExpires == neverExpires) {
+					return "Never";
+				}
+				return parseMSTime(accountExpires);
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			｝
 		}
 		return null;
 	}
@@ -1574,7 +1839,7 @@ public class LdapApi {
 			e.printStackTrace();
 		}
 		return map;
-	}
+	}	
 
 	/**
 	 * @param ldapClient
@@ -1641,6 +1906,13 @@ public class LdapApi {
 			e.printStackTrace();
 		}
 		return map;
+	}
+
+	String LdapEscape(String ldap) {
+		if (ldap == null)
+			return "";
+		return ldap.replace("\\", "\\5C").replace("*", "\\2A").replace("(", "\\28").replace(")", "\\29").replace("\000","\\00");
+		}
 	}
 
 	/**
