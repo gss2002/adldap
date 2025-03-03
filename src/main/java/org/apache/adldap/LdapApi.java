@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -468,6 +467,39 @@ public class LdapApi {
 		} else {
 			return null;
 		}
+	}
+	
+	/**
+	* @param ldapClient
+	* @param baseDn
+	* @param samAccountName
+	* @return String accountExpires
+	*/
+	public String getAccountExpires(LdapClient ldapClient, String baseDn, String samAccountName) {
+		String filter = "(&(samAccountName=" + samAccountName + ") (objectclass=person) )";
+		NamingEnumeration<SearchResult> results;
+		try {
+			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,ldapClient.getLdapBean().getConstraints());
+			while (results.hasMore()) {
+				SearchResult searchResult = results.next();
+				Attributes attributes = searchResult.getAttributes();
+				Attribute attr = attributes.get("accountExpires");
+				if (attr != null) {
+					long accountExpires = Long.parseLong ((String) attr.get());
+					if (results != null)
+						results.close();
+					if (accountExpires == neverExpires) {
+						return "Never";
+					}
+					return parseMSTime (accountExpires);
+				}
+			}
+			if (results != null)
+				results.close();
+		} catch (NamingException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
@@ -1850,7 +1882,8 @@ public class LdapApi {
 	 * @return Map<String, Attribute> userAttributeMap
 	 */
 	public Map<String, Attribute> getUserDNAttrs(LdapClient ldapClient, String baseDn, String dn) {
-		String filter = "(&(distinguishedName=" + dn + ")(objectclass=person))";
+		String escapedDn = LdapEscape(dn) ;
+		String filter = "(&(distinguishedName=" + escapedDn + ") (objectclass=person))";		
 		HashMap<String, Attribute> map = null;
 		SearchControls srchCntrls = ldapClient.getLdapBean().getConstraints();
 		srchCntrls.setReturningAttributes(reverseAttrs);
@@ -1892,7 +1925,8 @@ public class LdapApi {
 	 * @return Map<String, Attribute> groupAttributeMap
 	 */
 	public Map<String, Attribute> getGroupDNAttrs(LdapClient ldapClient, String baseDn, String dn) {
-		String filter = "(&(distinguishedName=" + dn + ")(objectclass=group))";
+		String escapedDn = LdapEscape(dn) ;
+		String filter = "(&(distinguishedName=" + escapedDn + ") (objectclass=group))";
 		HashMap<String, Attribute> map = null;
 		SearchControls srchCntrls = ldapClient.getLdapBean().getConstraints();
 		srchCntrls.setReturningAttributes(reverseAttrs);
@@ -2105,7 +2139,7 @@ public class LdapApi {
 	 * @return String samAccountName
 	 */
 	public String getSamAccountNameFromEUPN(LdapClient ldapClient, String baseDn, String eUPN) {
-		String filter = "(&(userPrincipalName=" + eUPN + ") (|(objectclass=person)(objectclass=group)))";
+		String filter = "(&(userPrincipalName=" + eUPN + ")(|(objectclass=person)(objectclass=group)))";
 		NamingEnumeration<SearchResult> results;
 		try {
 			results = ldapClient.getLdapBean().getLdapCtx().search(baseDn, filter,
@@ -2164,7 +2198,8 @@ public class LdapApi {
 	}
 
 	/**
-	 * @param searchResults Qreturn String msDS-UserPasswordExpiryTimeComputed
+	 * @param searchResults 
+	 * @return String msDS-UserPasswordExpiryTimeComputed
 	 */
 
 	public String getMsDSUserPasswordExpiryTimeComputed(Map<String, Attribute> searchResults) {
@@ -2186,7 +2221,8 @@ public class LdapApi {
 	/**
 	 * @param ldapClient
 	 * @param baseDn
-	 * @param samAccountName Creturn String msDS-KeyVersionNumber
+	 * @param samAccountName 
+	 * @return String msDS-KeyVersionNumber
 	 */
 	public String getMsDSKeyVersionNumber(LdapClient ldapClient, String baseDn, String samAccountName) {
 		String filter = "(&(samAccountName=" + samAccountName + ") (objectclass=person))";
